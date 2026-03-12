@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  repo_url: MyString
+  base_branch: MyString
+  compare_branch: MyString
+  status: MyString
+
+two:
+  repo_url: MyString
+  base_branch: MyString
+  compare_branch: MyString
+  status: MyString
