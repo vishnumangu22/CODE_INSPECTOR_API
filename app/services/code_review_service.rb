@@ -30,6 +30,8 @@ class CodeReviewService
     puts ruby_files
 
     ast_results = []
+    syntax_errors = []
+    alternatives = []
 
     Dir.chdir(repo_path) do
       ruby_files.each do |file|
@@ -50,19 +52,35 @@ class CodeReviewService
           old_methods: old_methods,
           new_methods: new_methods
         }
+
+        # Step 7: Run Syntax Analyzer
+        syntax_errors += Analysis::SyntaxAnalyzerService
+                          .new(file, new_code)
+                          .detect
+
+        # Step 8: Run Alternative Code Generator
+        alternatives += Analysis::AlternativeCodeService
+                          .new(file, new_code)
+                          .generate
       end
     end
 
     puts "AST Parsed Methods:"
     puts ast_results
 
-    # Step 7: Run impact analyzer (FIX HERE)
+    # Step 9: Run Impact Analyzer
     analyzer = ImpactAnalyzerService.new(ast_results, repo_path)
     flags = analyzer.analyze
 
     puts "Impact Flags:"
     puts flags
 
-    flags
+    {
+      message: "Code review completed",
+      review_id: @review.id,
+      flags: flags,
+      syntax_errors: syntax_errors,
+      alternatives: alternatives
+    }
   end
 end

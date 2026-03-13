@@ -367,6 +367,7 @@ DEPENDENCIES
   debug
   image_processing (~> 1.2)
   kamal
+  parser
   puma (>= 5.0)
   rails (~> 8.1.2)
   rubocop-rails-omakase
