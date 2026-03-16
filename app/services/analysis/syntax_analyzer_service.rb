@@ -9,7 +9,6 @@ module Analysis
 
     def detect
       errors = []
-
       return errors if @code.nil? || @code.strip.empty?
 
       buffer = Parser::Source::Buffer.new(@file)
@@ -17,7 +16,8 @@ module Analysis
 
       parser = Parser::CurrentRuby.new
 
-      # Handle parser diagnostics safely
+      parser.diagnostics.all_errors_are_fatal = false
+
       parser.diagnostics.consumer = lambda do |diagnostic|
         errors << {
           type: "syntax_error",
@@ -31,12 +31,7 @@ module Analysis
       parser.parse(buffer)
 
       errors
-    rescue Parser::SyntaxError => e
-      errors << {
-        type: "syntax_error",
-        file: @file,
-        error: e.message.split("\n").first
-      }
+    rescue StandardError
       errors
     end
   end

@@ -4,11 +4,7 @@ class Api::V1::CodeReviewsController < ApplicationController
 
     result = CodeReviewService.new(review).call
 
-    render json: {
-      message: "Code review completed",
-      review_id: review.id,
-      flags: result
-    }
+    render json: result
   end
 
   private
