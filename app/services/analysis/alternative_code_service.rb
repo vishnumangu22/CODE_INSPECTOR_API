@@ -27,13 +27,12 @@ module Analysis
       return unless node.is_a?(Parser::AST::Node)
 
       if node.type == :send
-        receiver, method_name, *args = *node
+        receiver, method_name = *node
 
         if method_name == :first && receiver&.type == :block
           send_node = receiver.children[0]
 
           if send_node.type == :send && send_node.children[1] == :select
-            collection = send_node.children[0].loc.expression.source
             block_source = receiver.loc.expression.source
 
             original = node.loc.expression.source
