@@ -34,19 +34,29 @@ class ImpactAnalyzerService
   private
 
   def calculate_risk(flags)
-    weights = {
-      "Method removed" => 5,
-      "Argument changed" => 4,
-      "Logic changed" => 3,
-      "Dependency changed" => 2,
-      "Method added" => 1,
-      "Method renamed" => 2
-    }
-
     score = 0
 
     flags.each do |flag|
-      score += weights[flag[:message]] || 0
+      case flag[:type]
+
+      when "impact"
+        case flag[:message]
+        when "Method removed"
+          score += 5
+        when "Argument changed"
+          score += 4
+        when "Logic changed"
+          score += 3
+        when "Method renamed"
+          score += 2
+        when "Method added"
+          score += 1
+        end
+
+      when "dependency_impact"
+        score += 6   # 🔥 correct place
+
+      end
     end
 
     score

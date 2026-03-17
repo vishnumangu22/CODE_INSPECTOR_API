@@ -17,6 +17,7 @@ module Rules
           new_method = new_methods.find { |m| m[:name] == old_method[:name] }
           next unless new_method
 
+
           old_body = BodyNormalizerService.new(old_method[:body]).normalize
           new_body = BodyNormalizerService.new(new_method[:body]).normalize
 

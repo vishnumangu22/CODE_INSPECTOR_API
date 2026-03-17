@@ -68,7 +68,9 @@ class AstParserService
 
       body_lines << line unless line.strip.start_with?("def") || line.strip == "end"
 
-      break if depth == 0
+      if depth == 0
+        break
+      end
     end
 
     body_lines.join("\n").strip

@@ -11,7 +11,21 @@ class CodeReviewService
       repo_path = GitRepositoryService.new(@review.repo_url, @review.id).clone_repository
       puts "Repository cloned at: #{repo_path}"
 
-      # Step 2: Generate structured diff
+      Dir.chdir(repo_path) do
+        # Step 2: Validate branches exist
+        base_exists = system("git rev-parse --verify origin/#{@review.base_branch} > /dev/null 2>&1")
+        compare_exists = system("git rev-parse --verify origin/#{@review.compare_branch} > /dev/null 2>&1")
+
+        unless base_exists
+          raise "Base branch '#{@review.base_branch}' does not exist"
+        end
+
+        unless compare_exists
+          raise "Compare branch '#{@review.compare_branch}' does not exist"
+        end
+      end
+
+      # Step 3: Generate structured diff
       diff_parser = StructuredDiffParserService.new(
         repo_path,
         @review.base_branch,
@@ -23,7 +37,7 @@ class CodeReviewService
       puts "Structured Diff:"
       puts structured_diff
 
-      # Step 3: Identify changed Ruby files
+      # Step 4: Identify changed Ruby files
       changed_files = structured_diff.map { |change| change[:file] }.uniq
       ruby_files = changed_files.select { |file| file.end_with?(".rb") }
 
@@ -75,13 +89,14 @@ class CodeReviewService
       puts "AST Parsed Methods:"
       puts ast_results
 
+      # Step 5: Run Impact Analyzer
       analyzer = ImpactAnalyzerService.new(ast_results, repo_path)
       impact_result = analyzer.analyze
 
       puts "Impact Flags:"
       puts impact_result
 
-      # ✅ Update status to completed
+      # Update review status
       @review.update(status: "completed")
 
       {
@@ -95,6 +110,7 @@ class CodeReviewService
       }
 
     rescue => e
+      puts "Code review failed: #{e.message}"
       @review.update(status: "failed")
       raise e
     end
