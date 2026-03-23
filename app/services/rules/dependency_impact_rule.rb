@@ -14,7 +14,6 @@ module Rules
       renamed_methods = {}
       changed_args_methods = {}
 
-      # Step 1: Identify changes
       @ast_results.each do |result|
         old_methods = result[:old_methods]
         new_methods = result[:new_methods]
@@ -32,7 +31,6 @@ module Rules
           end
         end
 
-        # Argument changes
         old_methods.each do |old_m|
           new_m = new_methods.find { |m| m[:name] == old_m[:name] }
           next unless new_m
@@ -48,14 +46,12 @@ module Rules
 
       removed_methods.uniq!
 
-      # Step 2: Scan entire repo using AST
+
       ruby_files = Dir.glob(File.join(@repo_path, "**/*.rb"))
 
       ruby_files.each do |file|
-        # Skip test/spec files if needed (optional)
         next if file.include?("/spec/") || file.include?("/test/")
 
-        # Check removed methods
         removed_methods.each do |method|
           if method_used_in_file?(file, method)
             flags << {
@@ -66,7 +62,6 @@ module Rules
           end
         end
 
-        # Check renamed methods
         renamed_methods.each do |old_name, new_name|
           if method_used_in_file?(file, old_name)
             flags << {
@@ -77,7 +72,6 @@ module Rules
           end
         end
 
-        # Check argument changes
         changed_args_methods.each do |method, arg_info|
           if method_used_in_file?(file, method)
             flags << {
@@ -94,7 +88,6 @@ module Rules
 
     private
 
-    # 🔥 AST-based method usage detection
     def method_used_in_file?(file, method_name)
       code = File.read(file)
       ast = Parser::CurrentRuby.parse(code)
@@ -108,13 +101,11 @@ module Rules
 
         receiver, method, *args = *node
 
-        # Normal method call: obj.method OR method()
         if method == method_name.to_sym
           found = true
           break
         end
 
-        # Dynamic calls: send(:method), public_send(:method)
         if [ :send, :public_send ].include?(method)
           if args[0]&.type == :sym && args[0].children[0] == method_name.to_sym
             found = true
@@ -128,7 +119,6 @@ module Rules
       false
     end
 
-    # 🔁 Recursive AST traversal
     def traverse_ast(node, &block)
       return unless node.is_a?(Parser::AST::Node)
 

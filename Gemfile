@@ -21,6 +21,13 @@ gem "solid_queue"
 gem "solid_cable"
 gem "hirb"
 gem "parser"
+group :development, :test do
+  gem "rswag"
+end
+
+group :development, :test do
+  gem "rspec-rails"
+end
 
 
 # Reduces boot times through caching; required in config/boot.rb
