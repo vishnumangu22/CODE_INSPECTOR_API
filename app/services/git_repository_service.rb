@@ -17,6 +17,7 @@ class GitRepositoryService
 
     success = system("git clone #{@repo_url} #{repo_path}")
 
+
     unless success
       raise "Repository cloning failed for #{@repo_url}"
     end
@@ -24,7 +25,7 @@ class GitRepositoryService
     # Fetch all branches to ensure diff works
     Dir.chdir(repo_path) do
       puts "Fetching branches..."
-      system("git fetch --all")
+      system("git fetch -all")
     end
 
     puts "Repository cloned successfully to #{repo_path}"

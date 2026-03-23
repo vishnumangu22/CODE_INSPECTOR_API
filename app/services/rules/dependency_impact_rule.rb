@@ -22,14 +22,12 @@ module Rules
         old_names = old_methods.map { |m| m[:name] }
         new_names = new_methods.map { |m| m[:name] }
 
-        # Removed methods
         removed_methods += (old_names - new_names)
 
-        # Renamed methods (basic heuristic)
         old_methods.each do |old_m|
           new_methods.each do |new_m|
             if old_m[:body] == new_m[:body] && old_m[:name] != new_m[:name]
-              renamed_methods[old_m[:name]] = new_m[:name]
+              renamed_methods[ola-_m[:name]] = new_m[:name]
             end
           end
         end

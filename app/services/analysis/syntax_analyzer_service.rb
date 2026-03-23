@@ -10,12 +10,13 @@ module Analysis
     def detect
       errors = []
       return errors if @code.nil? || @code.strip.empty?
+
       buffer = Parser::Source::Buffer.new(@file)
       buffer.source = @code
 
       parser = Parser::CurrentRuby.new
 
-      parser.diagnostic.all_errors_are_fatal = false
+      parser.diagnostics.all_errors_are_fatal = false
 
       parser.diagnostics.consumer = lambda do |diagnostic|
         errors << {
