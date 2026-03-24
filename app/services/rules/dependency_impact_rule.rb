@@ -46,7 +46,6 @@ module Rules
 
       removed_methods.uniq!
 
-
       ruby_files = Dir.glob(File.join(@repo_path, "**/*.rb"))
 
       ruby_files.each do |file|
